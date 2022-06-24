@@ -64,5 +64,12 @@ for (var i = 0; i < 3; i++) {
 funcs[0](); // 0
 
 /**
- * 解决方法 2
+ * 解决方法 2 ES6
  */
+var funcs2 = [];
+for (let i = 0; i < 3; i++) {
+  funcs2[i] = function () {
+    console.log(i);
+  };
+}
+funcs2[0]();

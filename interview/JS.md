@@ -18,13 +18,17 @@
 
 #### 暂时性死区的原理是什么？为什么提前访问 let 定义的变量会抛错？讲讲其中的过程？
 
+- 程序控制流程在新的作用域进行实例话的时候，次作用域中 let/const 会先被创建出来，但是未进行词法绑定；所以不能被访问
+- 在变量创建到词法绑定的这个过程被称作暂时性死区
+
 #### 循环中的块级作用域
 
-- let 在循环中的声明是单独定义的
+- let 在循环在的声明内部的行为是标准中单独定义的
+- 使用`for(let i = 0; i < 3; i++)`中，会在圆括号内建立一个隐藏的作用域
 
 ### const 对象的属性可以修改吗
 
-- 可以
+- 可以，const 只是不允许修改值的绑定，值是可以修改的
 
 ### 箭头函数和普通函数的区别
 
@@ -83,15 +87,40 @@ bar.call(barObj);
 
 ### proxy 可以实现什么功能
 
-- 监听
+- 自定义对象的操作
+- 常用于数据的监听，比如对象的 set、get 操作
 
 ### 对对象和数组的结构的理解
 
+- 数组：以元素位置作为匹配条件
+- 对象：以属性名称为匹配条件
+
 ### 如何提取高度嵌套的对象里的指定属性
+
+```javascript
+const school = {
+  classes: {
+    stu: {
+      name: "bob",
+      age: 24,
+    },
+  },
+};
+const {
+  classes: {
+    stu: { name, age },
+  },
+} = school;
+```
 
 ### 对于 rest 参数的理解
 
+把函数的多个入参收敛到一个数组；用在获取函数的多余参数，或者处理参数个数不确定的情况
+
 ### ES6 中模版语法与字符串处理
+
+- 模版
+- 字符串处理: includes startsWith endsWith repeat
 
 # 原型
 
@@ -227,7 +256,38 @@ bar.call(barObj);
 
 ### JavaScript 有些哪些数据类型、它们的区别？
 
+- Undefined Null Boolean Number String Object Symbol BigInt
+- 栈：原始数据类型(undefined null boolean number string)：占据空间小、大小固定
+  - 数据结构中：先进后出
+  - 操作系统：栈区内内存由编译器自动分配释放，存放函数的参数值，局部变量的值。操作方式类似于数据结构中的栈；
+- 堆：引用数据类型(对象、数组、函数)：占据空间大、大小不固定；引用数据类型在栈中存储了指针；该指针指向该实体中的起始地址，当解释器寻找引用值，会首先检索其在栈中的地址，取得地址后从堆中获得实体；
+  - 数据结构：优先队列
+  - 操作系统：堆区内存由开发者分配释放，若开发者不释放，程序结束时由垃圾回收机制回收；
+
 ### 数据类型检测的方式有哪些
+
+- typeof
+  - 数组、对象、null 都会被判断为 object
+- instanceof
+  - 内部运行机制是判断在其原型链中能否找到该类型的原型；
+  - 只能判断引用数据类型，不能判断基本数据类型；
+- construtor
+  - 判断数据的类型
+  ```javascript
+  function Fn() {}
+  Fn.prototype = new Array();
+  let f = new Fn();
+  console.log(f.constructor === fn); //false
+  console.log(f.constructor === Array); // true
+  // --------
+  function Fn() {}
+  let f = new Fn();
+  console.log(f.constructor === fn); // true
+  ```
+  - 对象实例通过 constructor 对象访问他的构造函数
+- Object.prototype.toString.call()
+  - 使用 Object 对象的原型方法 toString 判断数据类型
+  - `obj.string()`不能得到其对象类型，只能将 obj 转换为字符串
 
 ### 判断数组的方式有哪些
 

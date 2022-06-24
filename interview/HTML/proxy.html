@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="test">test</div>
+  </body>
+  <script>
+    const handlerThrottle = () => console.log("Do something...");
+    const createThrottleProxy = (fn, rate) => {
+      let lastClick = Date.now() - rate;
+      console.log("outerLastClick");
+      return new Proxy(fn, {
+        apply(target, context, args) {
+          if (Date.now() - lastClick >= rate) {
+            fn(args);
+            lastClick = Date.now();
+          }
+        },
+      });
+    };
+    const handleProxy = createThrottleProxy(handlerThrottle, 2000);
+    document.getElementById("test").addEventListener("click", handleProxy);
+    const createImgProxy = (img, loadingImg, realImg) => {
+      let hasLoaded = false;
+      const virtualImg = new Image();
+      virtualImg.src = realImg;
+      virtualImg.onload = () => {
+        Reflect.set(img, "src", realImg);
+        hasLoaded = true;
+      };
+      return new Proxy(img, {
+        get(obj, prop) {
+          if (prop === "src" && !hasLoaded) {
+            return loadingImg;
+          }
+          return obj[prop];
+        },
+      });
+    };
+    const img = new Image();
+    // img.src =
+    //   "http://test-inside-cc.songguo7.com/static/media/logo.568df2ab.png";
+    const imgProxy = createImgProxy(
+      img,
+      '"http://test-inside-cc.songguo7.com/static/media/logo.568df2ab.png"',
+      ""
+    );
+    document.getElementById("test").appendChild(imgProxy);
+  </script>
+</html>

@@ -1,25 +1,25 @@
-// function foo() {
-//   var _this = this;
-//   console.log(this);
-//   setTimeout(function () {
-//     console.log("id:", _this.id);
-//   }, 100);
-// }
-// foo();
+function foo() {
+  var _this = this;
+  console.log(this);
+  setTimeout(function () {
+    console.log("id:", _this.id);
+  }, 100);
+}
+foo();
 
-// let a,
-//   barObj = { msg: "bar的this指向" };
-// fooObj = { msg: "foo的this指向" };
-// bar.call(barObj); // 将bar的this指向barObj
-// foo.call(fooObj); // 将foo的this指向fooObj
-// function foo() {
-//   a(); // 结果：{ msg: 'bar的this指向' }
-// }
-// function bar() {
-//   a = () => {
-//     console.log(this, "this指向定义的时候外层第一个普通函数"); //
-//   }; // 在bar中定义 this继承于bar函数的this指向
-// }
+let a,
+  barObj = { msg: "bar的this指向" };
+fooObj = { msg: "foo的this指向" };
+bar.call(barObj); // 将bar的this指向barObj
+foo.call(fooObj); // 将foo的this指向fooObj
+function foo() {
+  a(); // 结果：{ msg: 'bar的this指向' }
+}
+function bar() {
+  a = () => {
+    console.log(this, "this指向定义的时候外层第一个普通函数"); //
+  }; // 在bar中定义 this继承于bar函数的this指向
+}
 
 function bar() {
   console.log(arguments); // ['外层第二个普通函数的参数']
