@@ -79,3 +79,12 @@ type MyConstructor<T extends new (...args: any) => any> = T extends new (
 type Flatten<T extends any[]> = T extends [infer First, ...infer Rest]
   ? [...(First extends any[] ? Flatten<First> : [First]), ...Flatten<Rest>]
   : T;
+
+interface Get {
+  host_group?: {
+    name: string;
+    mapped: boolean;
+  }[];
+  limit?: number;
+}
+type a = NonNullable<Get["host_group"]>[number]["name"];

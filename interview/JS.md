@@ -291,17 +291,95 @@ const {
 
 ### 判断数组的方式有哪些
 
+- Object.prototype.toString.call()
+  - slice 第二个参数 endIndex 负数相当于`str.length + endIndex`
+
+```javascript
+Object.prototype.toString.call(obj).slice(8, -1);
+```
+
+- 通过原型链
+
+```javascript
+obj.__prote__ === Array.prototype;
+```
+
+- isArray
+
+```javascript
+Array.isArray(obj);
+```
+
+- instanceof
+
+```javascript
+obj instanceof Array;
+```
+
+- Array.prototype.isPrototypeOf
+
+```javascript
+Array.prototype.isPrototypeOf(obj);
+```
+
 ### null undefined 区别
+
+- undefined 表示未定义，null 表示空对象
+- undefined 不是保留字，可以用`void 0`获得安全的 undefined 值
 
 ### typeof null 的结果是什么？为什么
 
+- 结果是 Object
+- 原因：在 JS 的第一个版本中，所有值都存在 32 位的单元中；每个单元包含一个类型标签；类型标签存储在每个单元的低位
+
+```js
+000 Object
+1 int
+010 double
+100 string
+110 boolean
+```
+
+- 如果低位是 1，则类型标签长度只有一位；如果低位是 0，则类型标签标志位的长度 3 位；为存储其他 4 种数据类型提供了额外的的两个 bit 长度；
+- 两种特殊的数据类型
+  - undefined
+  - null 的值是机器码 NULL 指针（null 指针的值全是 0）；null 的类型标签也是 000，和 Object 一样，所以会被判定为 Object
+
 ### instanceof 操作符的实现原理及实现
+
+- 见 myInstanceof.js
 
 ### 为什么 0.1+0.2!==0.3 如何让其相等
 
+#### 为什么？
+
+- 双精度存储展 64 位
+  - sign 区分正负数 1 位
+  - 指数 11 位
+  - 小数 52 位
+- 加上科学记数法整数部分的 1，有 53 位有效数字
+- 0.1 的二进制:0.00011001100...101（1100 循环）
+- 0.2 的二进制:0.00110011001...101 (1100 循环)
+- 相加的时 0.2 的二进制后补零得到结果 0.0100110011001100110011001100110011001100110011001100111
+
+#### 怎么相等
+
+- 设置一个误差范围，JS 提供了`Number.EPSILON`属性，它的值是 2^-52
+
+```javascript
+function numberepsilon(arg1, arg2) {
+  return Math.abs(arg1 - arg2) < Number.EPSILON;
+}
+```
+
 ### 如何获取安全的 undefined 值
 
+- void 0
+
 ### typeof NaN 结果是什么
+
+- number
+- NaN 是一个特殊值，唯一一个非自反的值即,`NaN === NaN`的结果为 false
 
 ### isNaN 和 Number.isNaN 函数的区别
 
