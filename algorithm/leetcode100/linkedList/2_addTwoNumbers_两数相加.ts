@@ -2,7 +2,7 @@ import {
   ListNode,
   array2ListNode,
   listNode2Array,
-} from "../definition/listDefinition";
+} from "../../definition/listDefinition";
 function addTwoNumbers(
   l1: ListNode | null,
   l2: ListNode | null

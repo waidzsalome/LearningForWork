@@ -383,22 +383,197 @@ function numberepsilon(arg1, arg2) {
 
 ### isNaN 和 Number.isNaN 函数的区别
 
+- `isNaN` 不能被转换成数值的值都会返回 true
+- `Number.isNaN` 首先判断是否为数字，再判断是否为 NaN；使用这个判断是否是数字更准确
+
 ### == 操作符的强制类型转换规则
+
+如果对比双方类型不同，就会强制类型转换，以 x、y 为例
+
+- 判断类型是否相同，相同的话比较两者大小；类型不同，比较大小；
+- 是否在比较 null 和 undefined，是的话返回 true；
+- 判断是否为 string 和 number，是的话字符串转换为 number；
+- 判断其中一方是否为 boolean，是的话 boolean 转换成 number；
+
+```javascript
+"1" == true;
+"1" == 1;
+1 == 1;
+```
+
+- 判断一方是否为 Object 且另一方为 string、number、symbol
+
+```javascript
+"1" == { name: "js" };
+"1" == "[object Object]";
+```
 
 ### 其他值到字符串的规则转换
 
+- null -> 'null' undefined -> undefined
+- Boolean: true->'true' false-> 'false'
+- Number 直接转换 极大极小用指数形式
+- Symbol 直接转换 只允许强制类型转换
+
+```javascript
+let s = Symbol(1);
+String(s); // 'Symbol 1'
+```
+
+- 普通对象 调用 Object.prototype.toString()来返回内部属性[[class]]的值；如果自定义 toString()方法，字符串化时就会调用该方法；
+
 ### 其他值到数字值的规则转换
+
+- undefined -> NaN null -> 0
+- Boolean: true -> 1 false -> 0
+- String 类型的转换相当于`Number()` 包含非数值 NaN，空字符串 0；
+- Symbol 类型的值不能转换为数字
+- 对象（包括数组）会首先被转换为相应的基本类型值，如果返回的是非数字的基本类型值，再遵循上面的规则
+  - toPrimitive 作为一个属性表示"一个方法，该方法将对象转换为相应的原始值。由 ToPrimitive 抽象操作使用" 会首先检查是否有 valueOf 方法，如果有并且返回基本类型值；如果没有就使用 toString()的返回值；如果都没有 TypeError；
+
+```javascript
+class Bar {
+  constructor() {
+    this[Symbol.toPrimitive] = function (hint) {
+      switch (hint) {
+        case "number":
+          return 3;
+        case "string":
+          return "string bar";
+        case "default":
+        default:
+          return "default bar";
+      }
+    };
+  }
+}
+let bar = new Bar();
+// 这里 只有+可以被用作字符串拼接
+console.log(3 + bar); // "3default bar"
+console.log(3 - bar); // 0
+console.log(String(bar)); // "string bar"
+```
+
+### 其他值到布尔类型值的转换规则
+
+- undefined null false +0 -0 NaN ''都是 false
 
 ### || 和 && 操作符的返回值
 
+- || 第一个值 true，返回第一个值；第一个值 false，返回第二个值
+- && 第一个值 true 返回第二个值，第一个值 false 返回第一个值
+- || 和 && 返回的都是值而不是操作结果
+
 ### Object.is() 与比较操作符'===' '=='的区别
+
+- Object.is() 判断两个值是否为同一个
+
+```javascript
+Object.is(+0, -0); // false
+Objecet.is(NaN, NaN); //true
+```
 
 ### 什么 javascript 中的包装类型
 
+- js 基本类型没有属性和方法，为了便于操作基本类型的值，在调用基本类型的属性或方法时，js 会在后台隐式地将基本类型的值转换为对象
+
+```js
+let a = 'abc
+Object(a) // String {'abc}
+```
+
+- `valueof` 方法将包装类型倒转成基本类型
+
+```js
+var a = "abc";
+var b = Object(a);
+var c = b.valueOf(); // 'abc'
+```
+
+- 下面代码触发不到 if 内的；false 被包装成包装类型后就成了对象，所以其非值为 false
+
+```js
+var a = new Boolean(false);
+if (!a) {
+  console.log("ops"); // never returns
+}
+```
+
 ### JavaScript 中如何进行隐式类型转换
 
-### -操作符什么时候用于字符串的拼接
+- `ToPrimitive(input [, PreferredType])` 用来把 input 转换成原始值；
+  - 如果没有传入 PreferredType，则 hint 是 default
+  - PreferredType 是为 String 则 hint 是 string
+  - PreferredType 是为 Number 则 hint 是 number
+  - 如果 input 对象有@@toPrimitive 方法，则让 exoticToPrim 的值为这个方法，否则 exoticToPrim 为 undefined
+  - 如果 exoticToPrim 的值不为 undefined，则
+    - 让 result 的值为调用 exoticToPrim 后得到的值
+    - 如果 result 是原值，则返回
+    - 抛出 TypeError 错误
+  - 否则，如果 hint 的值为'default'，则把 hint 的值重新赋为'number'
+  - 返回`OrdinaryToPrimitive(input,hint)`
+    - 如果 hint 值为 string 则
+      - 调用 input 对象的 toString()方法，如果值是原值则返回
+      - 否则，调用 input 对象的 valueOf()方法，如果值是原值则返回
+      - 否则，抛出 TypeError 错误
+    - 如果 hint 值为 number 则
+      - 调用 input 对象的 valueOf()方法，如果值是原值则返回
+      - 否则，调用 input 对象的 toString()方法，如果值是原值则返回
+      - 否则，抛出 TypeError 错误
+- 隐式类型转换主要发生在`+ - * / == > <`运算符之间
+  - `+`
+  - `- * /`
+  ```js
+  1 * "23"; //23
+  ```
+  - `==`
+  ```js
+  3 == true; //false
+  "0" == false; // true
+  "0" == 0; //true;
+  ```
+  - `< >`
+  ```js
+  "ca" < "bd"; // false
+  "a" < "b"; // true
+  "12" < 13; // true
+  false > -1; //true
+  let a = {};
+  a > 2; // false
+  /* 过程
+   * a.valueOf
+   * a.toString
+   * Number(a.toString())
+   * NaN > 2 //false
+   */
+  let b = { name: "Jack" };
+  let c = { age: 18 };
+  a + b; // "[object Object][object Object]"
+  ```
+
+### + 操作符什么时候用于字符串的拼接
+
+- 如果其中一个操作数是对象（包括数组），则首先对其调用 ToPrimitive 抽象操作，该抽象操作再调用 [[DefaultValue]]，以数字作为上下文。如果不能转换为字符串，则会将其转换为数字类型进行计算
+- 如果+的其中一个操作符是字符串（或通过以上步骤最终得到字符串），则执行字符串拼接，否则执行数字加法；
+- 对于除了+的运算符来说，只要其中一方是数字，那么另一方就会被转成数字
+
+```js
+1 + "23"; //'123
+1 + false; //1
+1 + Symbol(); //TypeError
+"1" + false; // '1false'
+false + true; //1
+// Symbole不能隐式类型转换
+"1" + Symbol(); // TypeError
+```
 
 ### 为什么会有 BigInt 的提案
 
+- js 中超过最大安全数字(Number.MAX_SAFE_INTEGER)的返回，就会精度丢失，出现计算不准确的问题；
+
 ### Object.assign 和扩展运算符是深拷贝还是浅拷贝、两者区别
+
+都是浅拷贝
+
+- Object.assign()方法接收的第一个参数作为目标对象，后面的所有参数作为源对象。然后把所有的源对象合并到目标对象中。它会修改了一个对象，因此会触发 ES6 setter。
+- 扩展操作符，数组或对象中的每一个值都会被拷贝到一个新的数组或对象中。它不复制继承的属性或类的属性，但是它会复制 ES6 的 symbols 属性。
