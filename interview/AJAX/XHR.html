@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XHR</title>
+  </head>
+  <body></body>
+  <!-- <script src="./ajaxWithTS.js" /> -->
+  <!-- <script>
+    // xhrGet
+    const xhrGet = new XMLHttpRequest();
+    xhrGet.open(
+      "GET",
+      "https://www.baidu.com/img/flexible/logo/pc/result.png",
+      true
+    );
+    xhrGet.onreadystatechange = () => {
+      if (xhrGet.readyState === 4) {
+        if (xhrGet.status === 200) {
+          console.log(JSON.parse(xhrGet.responseText));
+        } else {
+          console.log("其他情况");
+        }
+      }
+    };
+    xhrGet.send(null);
+    // xhrPost;
+    const xhrPost = new XMLHttpRequest();
+    xhrPost.open("POST", "https://ug.baidu.com/mcp/pc/pcsearch", true);
+    xhrPost.onreadystatechange = () => {
+      if (xhrPost.readyState === 4) {
+        if (xhrPost.status === 200) {
+          console.log(JSON.parse(xhrPost.responseText));
+        } else {
+          console.log("其他情况");
+        }
+      }
+    };
+    const postData = {
+      invoke_info: {
+        pos_1: [{}],
+        pos_2: [{}],
+        pos_3: [{}],
+      },
+    };
+    xhrPost.send(JSON.stringify(postData));
+  </script> -->
+</html>

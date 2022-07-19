@@ -28,8 +28,8 @@ function twoSumHash(nums: number[], target: number): number[] {
   }
   return [];
 }
-let nums = [3, 3],
+let num = [3, 3],
   target = 6;
 
-console.log(twoSum(nums, target));
-console.log(twoSumHash(nums, target));
+console.log(twoSum(num, target));
+console.log(twoSumHash(num, target));

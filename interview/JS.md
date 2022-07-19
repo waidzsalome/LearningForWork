@@ -18,7 +18,7 @@
 
 #### 暂时性死区的原理是什么？为什么提前访问 let 定义的变量会抛错？讲讲其中的过程？
 
-- 程序控制流程在新的作用域进行实例话的时候，次作用域中 let/const 会先被创建出来，但是未进行词法绑定；所以不能被访问
+- 程序控制流程在新的作用域进行实例化的时候，此作用域中 let/const 会先被创建出来，但是未进行词法绑定；所以不能被访问
 - 在变量创建到词法绑定的这个过程被称作暂时性死区
 
 #### 循环中的块级作用域
@@ -196,19 +196,145 @@ const {
 
 ### new 操作符的实现原理
 
+创建一个用户定义的对象类型的实例或具有构造函数的内置对象实例
+
+#### new 的时候发生了什么
+
+- 创建一个空对象
+- 为步骤 1 创建的对象添加属性`__proto__`，将该属性 链接至构造函数的原型对象
+- 将步骤 1 新创建的对象作为 this 的上下文
+- 如果该函数返回的是对象，那么就返回这个对象；否则返回的就是原始值，那么返回新创建的 obj；
+
+```js
+// 返回对象的情况
+function Test(name) {
+  this.name = name;
+  console.log(this); // Test { name: 'yck' }
+  return { age: 26 };
+}
+const t = new Test("yck");
+console.log(t); // { age: 26 }
+console.log(t.name); // 'undefined'
+// 返回原始值的情况
+function Test(name) {
+  this.name = name;
+  return 1;
+}
+const t = new Test("yck");
+console.log(t.name); // 'yck'
+```
+
+```js
+function create(cstr, ...args) {
+  const newObj = {};
+  newObj.__proto__ = cstr.prototype;
+  const res = cstr.apply(newObj, args);
+  // 如果构造函数没有显式的返回对象，就是用步骤1创建的对象
+  return res instanceof Object ? res : newObj;
+}
+```
+
 ### map 和 Object 的区别
+
+- map 默认不包含任何键，只能显式插入；Object 有一个原型，原型链上的键名有可能和自己在对象上设置的键名产生冲突
+- map 的键可以是任意值，Object 的键必须是 string 或 symbol
+- map 的 key 是有序的，迭代的时候以插入的顺序返回键值；Object 的键是无序的
+- Map 的键个数可以通过 size 属性获取，Object 只能手动计算
+- Map 是 interable 的，所以可以直接被迭代
 
 ### map 和 weakMap 的区别
 
+- map 键值对的集合，键不限范围；
+  - size
+  - set
+  - get
+  - has
+  - delete
+  - clear
+- map 结构提供三个遍历器生成函数和一个遍历方法
+  - keys()
+  - values()
+  - entries()
+  - forEach()
+- weakMap 中键名和值都是弱引用；键必须是对象；weakMap 的键名所引用的对象都是弱引用，即垃圾回收机制不将此引用考虑在内。因此，只要所引用的对象的其他引用都被清除，垃圾回收机制就会释放该对象所占用的内存。也就说，一旦不再需要，WeakMap 里面的键名对象和所对应的键值对会自动回收，不用手动删除引用。由于弱引用，WeakMap 的 key 是不可枚举的。
+  - set
+  - get
+  - has
+  - delete
+
 ### JavaScript 有哪些内置的对象
+
+- 标准内置对象
+  - 值属性，这些全局属性返回一个简单值。`Infinity` `NaN` `undefined` `null`
+  - 函数属性，全局函数可以直接调用。`eval()` `parseFloat()` `parseInt()`
+  - 基本对象，基本对象是定义或使用其他对象的基础，基本对象包括一般对象、函数对象和错误对象。例如 `Object`、`Function`、`Boolean`、`Symbol`、`Error`
+  - 数字、日期对象，数学计算`Number` `Math` `Date`
+  - 字符串、正则 `String` `RegExp`
+  - 可索引的集合对象，这些对象表示按照索引值来排序的数据集合，包括数组和类型数组。以及类数组结构的对象。`Array`
+  - 使用键的集合对象，这些集合对象在存储数据时会使用到键，支持按照插入顺序来迭代元素：`Map` `Set` `WeakMap` `WeakSet`
+  - 矢量集合`SIMD`
+  - 结构化数据 `JSON`
+  - 控制抽象对象 `Promise` `Generator`
+  - `Reflect` `Proxy`
+  - 国际化，为了支持多语言处理引入的对象 `Intl` `Intl.Collator`
+  - `WebAssembly`
+  - arguments
 
 ### 常用的正则表达式有哪些
 
+```js
+// （1）匹配 16 进制颜色值
+var regex = /#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})/g;
+
+// （2）匹配日期，如 yyyy-mm-dd 格式
+var regex = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+
+// （3）匹配 qq 号
+var regex = /^[1-9][0-9]{4,10}$/g;
+
+// （4）手机号码正则
+var regex = /^1[34578]\d{9}$/g;
+
+// （5）用户名正则
+var regex = /^[a-zA-Z\$][a-zA-Z0-9_\$]{4,16}$/;
+```
+
 ### 对 JSON 的理解
 
-### JavaScript 脚本延迟家在的方法有哪些
+- `JSON.stringify`
+- `JSON.Parse`
+
+### JavaScript 脚本延迟加载的方法有哪些
+
+- 普通的引用外部脚本文件，当浏览器解析到这个标签时会暂停对 HTML 的解析，发送网络请求并执行改脚本，执行完后恢复解析 HTML。
+- defer
+  - 当浏览器遇到带 defer 属性的`<script/>`标签时，会异步发送网络请求，不阻碍 html 的解析。等 html 解析完之后再执行 JS 代码
+  - html5 规范要求脚本应该按照他们出现的顺序执行，因此第一个推迟的脚本会在第二个推迟执行的脚本之前执行。两者都会在 DOMContentLoaded 事件之前执行。
+- asnyc
+  - 遇到带有 async 属性的`<script/>`标签时，会异步发送网络请求，不会阻碍 html 的解析；一旦网络请求完成，如果此时 html 还是没有解析完，浏览器会暂停解析，去执行 JS 代码，执行之后再接解析 HTML；
+  - 如果存在多个 async，那么他们之间的执行顺序也是不确定的。所以异步脚步不应该在加载期间修改 DOM。异步脚本会保证在页面 load 事件之前执行，但是可能会在 DOMContentLoaded 之前或之后
+  - 同时有 asnyc 和 defer 执行效果和 async 相同
+- 动态创建 DOM
+  - 动态创建 DOM 标签；对文档的加载时间进行监听，当文档加载完成后再动态创建`<script/>`标签引入 js 脚本
+- setTimeout，设置定时器延时
+- JS 放在最后加载，放在文档的底部，使 js 脚本尽可能在最后来加载执行
 
 ### Javascript 类数组对象的定义
+
+- 一个拥有 length 属性和若干索引属性的对象就可以被称为类数组对象；类数组对象和数组类似，但是不能调用数组方法。
+- 常见的有 arguments、DOM 方法返回的结果；函数也可以被看作类数组，其 length 属性返回参数的个数
+- 常见的类数组转换为数组的方法
+
+```js
+//通过call调用数组的slice方法
+Array.prototype.slice.call(arrayLike);
+//通过call调用数组的splice方法
+Array.prototype.splice.call(arrayLike);
+//通过apply调用数组的concat方法来实现转换
+Array.prototype.concat.apply([], arrayLike);
+// 通过Array.from
+Array.from(arrayLike);
+```
 
 ### 数组有哪些原生方法
 
@@ -216,17 +342,136 @@ const {
 
 ### 常见的位运算符有哪些？其计算规则是什么？
 
+| 运算符 | 描述 | 运算规则                                   | 用途                                            |
+| ------ | ---- | ------------------------------------------ | ----------------------------------------------- |
+| &      | 与   | 两个位都是 1                               | 判断奇偶（`i&1`为 0 是偶数、为 1 是奇数）、清零 |
+| ｜     | 或   | 一个位为 1                                 |
+| ^      | 异或 | 两个位相同为 1，不同为 0                   |
+| ~      | 取反 | 0->1,1->0                                  |
+| <<     | 左移 | 二进制位全部左移，高位丢弃，低位补 0       |
+| >>     | 右移 | 全部右移，正数左补 0，负数左补 1，右边丢弃 |
+
+- 原码、反码、补码
+  - 原码：一个数的二进制
+  - 反码：正数的反码与原码相同，负数的反码除符号位，按位取反
+  - 补码：正数的补码与原码相同，负数的补码除符号位外所有的位取反然后加 1
+
 ### 为什么函数的 arguements 参数是类数组而不是数组？如何遍历类数组？
+
+- 有 callee 和 length 属性，但是没有数组的常见方法
+- 遍历类数组
+
+```js
+Array.prototype.forEach.call(arguments, (a) => console.log(a));
+const arrArgs = Array.from(arguments);
+const arrArgs = [...arguments];
+```
 
 ### 什么是 DOM 和 BOM
 
-### 对类数组对象的理解，如何转化为数组？
+- DOM 指文档对象模型
+- BOM 指浏览器对象模型。BOM 的核心是 window 对象，window 对象具有双重角色：既是通过 js 访问浏览器窗口的一个借口，又是一个 Global 对象。
+  window 对象有很多子对象：location navigator screen;document 也是 window 的子对象
 
 ### escape、encodeURI、encodeURIComponent 的区别
 
 ### 对 AJAX 的理解、实现一个 AJAX 的请求
 
+- ajax 指通过 Javascript 的异步通信从服务器获取 XML 文档从中提取数据，再更新当前网页的对应部分。Ajax 是一个概念模型，是一个囊括了众多现有技术的集合，并补具体代指某项技术。 使用这个模型以后，网页应用能够快速地将增量更新呈现在用户界面上，而不需要重载（刷新）整个页面。这使得程序能够更快地回应用户的操作。Ajax 最重要的特性就是可以局部刷新页面。
+- axios 是一个基于 Promise 的网络请求库，作用于 Node.js 和浏览器中。在服务端它使用原生 Node.js http 模块，在客户端使用 XMLHttpRequest;
+  - 客户端 axios 的主要特性有：
+    - 从浏览器创建 XMLHttpRequest
+    - 支持 Promise API
+    - 拦截请求和响应
+    - 取消请求
+    - 自动转换 JSON 数据
+    - 客户端支持防御 XSRF
+- fetch 提供了一个获取资源的接口，比起 XMLHttpRequest 相同的功能，但被设计成更具可扩展性和高效性，核心在于对 HTTP 接口的抽象，包括 Request、Response、Headers 和 Body，以及用于初始化异步请求的 global fetch。有了这些抽象好的 HTTP 模块，其他接口能够很方便的使用这些功能。fetch() 方法必须接受一个参数——资源的路径。无论请求成功与否，它都返回一个 Promise 对象，resolve 对应请求的 Response。
+- 以下是使用 XMLHttpRequest 模块实现 Ajax
+
+```js
+// xhrGet
+const xhrGet = new XMLHttpRequest();
+xhrGet.open(
+  "GET",
+  "https://www.baidu.com/img/flexible/logo/pc/result.png",
+  true
+);
+xhrGet.onreadystatechange = () => {
+  if (xhrGet.readyState === 4) {
+    if (xhrGet.status === 200) {
+      console.log(JSON.parse(xhrGet.responseText));
+    } else {
+      console.log("其他情况");
+    }
+  }
+};
+xhrGet.send(null);
+// xhrPost;
+const xhrPost = new XMLHttpRequest();
+xhrPost.open("POST", "https://ug.baidu.com/mcp/pc/pcsearch", true);
+xhrPost.onreadystatechange = () => {
+  if (xhrPost.readyState === 4) {
+    if (xhrPost.status === 200) {
+      console.log(JSON.parse(xhrPost.responseText));
+    } else {
+      console.log("其他情况");
+    }
+  }
+};
+const postData = {
+  invoke_info: {
+    pos_1: [{}],
+    pos_2: [{}],
+    pos_3: [{}],
+  },
+};
+xhrPost.send(JSON.stringify(postData));
+```
+
+- 以下是使用 Promise 封装实现 AJAX ts
+
+```ts
+export default async function ajax(
+  options: AjaxRequest
+): Promise<AjaxResponse> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const method = options.method.toUpperCase();
+    xhr.open(method, options.url, true);
+    if (method === "GET") {
+      xhr.send(null);
+    }
+    if (method === "POST") {
+      xhr.setRequestHeader("Content-type", "application/json");
+      xhr.send(JSON.stringify(options.data));
+    }
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState !== 4 || xhr.status === 0) return;
+      const responseData: AjaxResponse = JSON.parse(xhr.response);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(responseData);
+      } else {
+        reject(`request failed with status code ${xhr.status}`);
+      }
+    };
+  });
+}
+```
+
 ### JavaScript 为什么要进行变量提升、它导致了什么问题
+
+- 变量提升产生的原因？
+  - JS 代码执行前会有一个解析的过程，解析的过程创建了执行上下文，初始化了一些代码执行时需要用到的对象。
+  - 当访问一个变量时，会到当前执行上下文中的作用域连去查找，而作用域的首端执向的是当前执行上下文的变量对象，这个变量对象是执行上下文的一个属性，它包含了函数的形参，所以的函数和变量声明。
+- JS 解析阶段：JS 会检查语法，并对函数进行预编译。解析的时候会创建一个全局执行上下文对象，先把代码中即将执行的变量、函数声明都拿出来，变量先赋值为 undefined，函数先声明好可使用。在一个函数执行之前，也会创建一个函数执行上下文环境，跟全局执行上下文类似，不过函数执行上下文会多出 this、arguments 和函数的参数。
+  - 全局上下文：变量定义，函数声明
+  - 函数上下文：变量定义，函数声明，this，arguments
+- JS 执行阶段：按照代码顺序依次执行
+- 为什么要进行变量提升，变量提升的优点
+  - 提高性能：语法检查和预编译只进行一次。预编译会生成的预编译代码，在预编译时，会统计声明了那些变量
+  - 容错性更好：
+- 函数和变量相比，会被优先提升。这意味着函数会被提升到更靠前的位置。函数提升优先级高于变量提升，且不会被同名变量声明覆盖，但是会被变量赋值后覆盖。而且存在同名函数与同名变量时，优先执行函数。
 
 ### 什么是尾调用、使用尾调用有什么好处？
 

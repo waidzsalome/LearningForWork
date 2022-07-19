@@ -72,6 +72,22 @@ type MyConstructor<T extends new (...args: any) => any> = T extends new (
 ) => any
   ? P
   : never;
+type MyReturnType<T extends (...args: any) => any> = T extends (
+  ...args: any
+) => infer R
+  ? R
+  : never;
+let id = 0;
+function createUser(name: string, position: string) {
+  return {
+    id: id++,
+    name,
+    position,
+    createdAt: new Date(),
+  };
+}
+
+type User = ReturnType<typeof createUser>;
 /**
  * Flatten 展开类型
  */
@@ -79,12 +95,3 @@ type MyConstructor<T extends new (...args: any) => any> = T extends new (
 type Flatten<T extends any[]> = T extends [infer First, ...infer Rest]
   ? [...(First extends any[] ? Flatten<First> : [First]), ...Flatten<Rest>]
   : T;
-
-interface Get {
-  host_group?: {
-    name: string;
-    mapped: boolean;
-  }[];
-  limit?: number;
-}
-type a = NonNullable<Get["host_group"]>[number]["name"];
