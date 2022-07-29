@@ -126,13 +126,77 @@ const {
 
 ### 对原型、原型链的理解
 
+- 每个实例对象（object）都有一个私有属性（称之为 `__proto__` ）指向它的构造函数的原型对象（prototype）。该原型对象也有一个自己的原型对象（`__proto__`），层层向上直到一个对象的原型对象为 null。根据定义，null 没有原型，并作为这个原型链中的最后一个环节。
+- 所有构造函数都是 Function 的实例，所有原型对象都是 Object 的实例除了 Object.prototype
+- 原型链示意
+  ![原型链示意](./prototype.png)
+
 ### 原型修改、重写
+
+- 修改
+
+```js
+function Person(name) {
+  this.name = name;
+}
+// 修改原型
+Person.prototype.getName = function () {};
+var p = new Person("hello");
+console.log(p.__proto__ === Person.prototype); // true
+console.log(p.__proto__ === p.constructor.prototype); // true
+```
+
+- 重写
+
+```js
+Person.prototype = {
+  getName: function () {},
+};
+var p = new Person("hello");
+console.log(p.__proto__ === Person.prototype); // true
+console.log(p.__proto__ === p.constructor.prototype); // false
+```
+
+- 扩展
+  - New-initialization 支持度高，最快，符合标准
+  - Object.create 允许一次性地直接设置 `__proto__ `属性，以便浏览器能更好地优化对象。同时允许通过 Object.create(null) 来创建一个没有原型的对象。
+  - Object.setPrototypeOf 允许动态操作对象的原型，甚至能强制给通过 Object.create(null) 创建出来的没有原型的对象添加一个原型。
+  - `__proto__` 将 `__proto__` 设置为非对象的值会静默失败，并不会抛出错误。
 
 ### 原型链指向
 
+```js
+p.__proto__; // Person.prototype
+Person.prototype.__proto__; // Object.prototype
+p.__proto__.__proto__; //Object.prototype
+p.__proto__.constructor.prototype.__proto__; // Object.prototype
+Person.prototype.constructor.prototype.__proto__; // Object.prototype
+p1.__proto__.constructor; // Person
+Person.prototype.constructor; // Person
+```
+
 ### 原型链的终点是什么？如何打印出原型链的终点
 
+```js
+Objecet.prototype.__proto__;
+// 结果是null
+```
+
 ### 如何获得对象非原型链上的属性
+
+- 使用`hasOwnProperty`方法判断属性是否属于原型链的属性
+
+```js
+function iterate(obj) {
+  var res = [];
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      res.push(key + ": " + obj[key]);
+    }
+  }
+  return res;
+}
+```
 
 # 异步
 
@@ -168,9 +232,105 @@ const {
 
 ### 对闭包的理解
 
+- 一个函数和对其周围状态（lexical environment，词法环境）的引用捆绑在一起（或者说函数被引用包围），这样的组合就是闭包（closure）。闭包是由函数以及声明该函数的词法环境组合而成的。常见的方式就是在一个函数内创建另一个函数，创建的函数可以访问到当前函数的局部变量。
+- 闭包例子
+
+```js
+function makeAdder(x) {
+  return function (y) {
+    return x + y;
+  };
+}
+
+var add5 = makeAdder(5);
+var add10 = makeAdder(10);
+
+console.log(add5(2)); // 7
+console.log(add10(2)); // 12
+```
+
+- 闭包模拟私有方法
+
+```js
+var Counter = (function () {
+  var privateCounter = 0;
+  function changeBy(val) {
+    privateCounter += val;
+  }
+  return {
+    increment: function () {
+      changeBy(1);
+    },
+    decrement: function () {
+      changeBy(-1);
+    },
+    value: function () {
+      return privateCounter;
+    },
+  };
+})();
+
+console.log(Counter.value()); /* logs 0 */
+Counter.increment();
+Counter.increment();
+console.log(Counter.value()); /* logs 2 */
+Counter.decrement();
+console.log(Counter.value()); /* logs 1 */
+```
+
+- 性能
+  在创建新的对象或者类时，方法通常应该关联于对象的原型，而不是定义到对象的构造器中。原因是这将导致每次构造器被调用时，方法都会被重新赋值一次
+
+```js
+// 不建议这么写
+function MyObject(name, message) {
+  this.name = name.toString();
+  this.message = message.toString();
+  this.getName = function () {
+    return this.name;
+  };
+
+  this.getMessage = function () {
+    return this.message;
+  };
+}
+// 推荐的写法
+function MyObject(name, message) {
+  this.name = name.toString();
+  this.message = message.toString();
+}
+MyObject.prototype.getName = function () {
+  return this.name;
+};
+MyObject.prototype.getMessage = function () {
+  return this.message;
+};
+```
+
 ### 对作用域、作用域链的理解
 
+- 全局作用域
+  - 在当前作用域中查找所需变量，但是该作用域没有这个变量，那这个变量就是自由变量。如果在自己作用域找不到该变量就去父级作用域查找，依次向上级作用域查找，直到访问到 window 对象就被终止，这一层层的关系就是作用域链。
+  - 作用域链的作用是保证对执行环境有权访问的所有变量和函数的有序访问，通过作用域链，可以访问到外层环境的变量和函数。
+- 函数作用域
+  - 函数作用域声明在函数内部的变零，一般只有固定的代码片段可以访问到
+  - 作用域分层，内层作用域可以访问到外层，反之不行
+- 块作用域
+  - 函数块是指被大括号 ("{}") 包裹住的相关联的 statements 的集合
+- 作用域链
+
 ### 对执行上下文的理解
+
+- 类型
+  - 全局上下文：只有一个，程序首次运行时创建，它会在浏览器中创建一个全局对象（window 对象），使 this 指向这个全局对象
+  - 函数上下文：函数被调用时创建的执行上下文。
+- 执行上下文
+  - 当 JavaScript 引擎第一次执行脚本时，会创建一个全局执行上下文并且压入栈顶，每当遇到一个函数调用，就会为该函数创建一个新的执行上下文并压入栈顶，引擎会执行位于执行上下文栈顶的函数，当函数执行完成之后，执行上下文从栈中弹出，继续执行下一个上下文。当所有的代码都执行完毕之后，从栈中弹出全局执行上下文。
+- 创建阶段
+  - this 绑定
+    - 在全局执行上下文中，this 指向全局对象（window 对象）
+    - 在函数执行上下文中，this 指向取决于函数如何调用。如果它被一个引用对象调用，那么 this 会被设置成那个对象，否则 this 的值被设置为全局对象或者 undefined
+- 执行阶段 此阶段会完成对变量的分配，最后执行完代码。
 
 # this/call/apply/bind
 
@@ -469,33 +629,165 @@ export default async function ajax(
   - 函数上下文：变量定义，函数声明，this，arguments
 - JS 执行阶段：按照代码顺序依次执行
 - 为什么要进行变量提升，变量提升的优点
-  - 提高性能：语法检查和预编译只进行一次。预编译会生成的预编译代码，在预编译时，会统计声明了那些变量
-  - 容错性更好：
+  - 提高性能：语法检查和预编译只进行一次。预编译会生成的预编译代码，在预编译时，会统计声明了那些变量，创建了哪些函数，并对函数的代码进行压缩，去除注释、空白等。这样做的好处就是每次执行函数时都可以直接为该函数分配栈空间；因为代码压缩，代码执行也更快了。
+  - 容错性更好：有了变量提示，一下两行代码就可以正常执行
+  ```js
+  a = 1;
+  var a;
+  console.log(a);
+  ```
 - 函数和变量相比，会被优先提升。这意味着函数会被提升到更靠前的位置。函数提升优先级高于变量提升，且不会被同名变量声明覆盖，但是会被变量赋值后覆盖。而且存在同名函数与同名变量时，优先执行函数。
 
 ### 什么是尾调用、使用尾调用有什么好处？
 
+- 函数的最后一步返回另一个函数的调用；代码执行是基于执行栈的，所以当在一个函数里调用另一个函数时，会保留当前的执行上下文，然后再新建另外一个执行上下文加入栈中。使用尾调用的话，这里已经是函数的最后一步，所以不必保存当前的执行上下文，节省了内存，这就是尾调用优化。但是 ES6 的尾调用优化是在严格模式下开启的，正常模式下是无效的。
+
 ### ES6 模块与 CommonJS 模块有什么异同
+
+- `export/import` 只有 es6 支持；import 是异步的
+- `module.exports/exports` node 和 es6 都支持
+- `require` node 和 es6 都支持的引入；同步加载
+- `CommonJS`是对模块的浅拷贝；`ES6 Module`是对模块的引用，也就是只存只读，不能改变其值，指针指向不能变，类似 const;
+- 当模块遇到 import 命令时，就会生成一个只读引用。等到脚本真正执行时，再根据这个只读引用，到被加载的那个模块里面去取值。
+- CommonJS 和 ES6 Module 都可以对引⼊的对象进⾏赋值，即对对象内部属性的值进⾏改变。
 
 ### 常见的 DOM 操作有哪些？
 
+- 节点的获取
+
+```js
+// dom 节点的获取
+// getElementById 按照id查询
+// getElementsByTagName 按照tagName
+// getElementsByClassName 按照类名查询
+// querySelectorAll 按照css选择器查询
+let imooc = document.getElementById("imooc"); //dom Node
+let pList = document.getElementsByTagName("p"); //HTMLCollection
+let moocList = document.getElementsByClassName("mooc"); //HTMLCollection
+let pListClass = document.querySelectorAll(".mooc"); // NodeList
+```
+
+- 创建新的节点
+
+```js
+// dom节点的创建
+let container = document.getElementById("container");
+let targetSpan = document.createElement("span");
+targetSpan.innerHTML = "targetSpan";
+container.appendChild(targetSpan);
+```
+
+- 删除节点
+
+```js
+// dom节点的删除
+let targetNode = document.getElementById("title");
+container.removeChild(targetNode);
+```
+
+- 修改 dom 元素
+
+```js
+// dom节点的修改，分为位置的修改和元素属性的修改等
+let content = document.getElementById("content");
+container.insertBefore(content, targetNode);
+```
+
 ### use strict 是什么意思？使用它区别是什么？
+
+- use strict 是一种 ECMAscript5 添加的（严格模式）运行模式
+- 目的
+  - 消除 js 语法的不合理、不严谨之处，减少怪异行为
+  - 消除代码运行的不安全之处，保证代码运行的安全
+  - 提高编译器效率、增加运行速度
+  - 为未来的新版本 js 做好铺垫
+- 区别
+  - 禁止使用 with 语句
+  - 禁止 this 指向全局变量
+  - 对象不能有重名属性
 
 ### 如何判断一个对象是否属于某个类
 
+- instanceof
+- constructor 不安全，constructor 属性可能被重写
+- 某个内置引用对象的话，可以用 `Object.prototype.toString()` 方法来打印对象的[[Class]] 属性来进行判断。
+
 ### 强类型语言和弱类型语言的区别
+
+- 强类型语言:要求变量的使用要严格符合定义，所用的变量都需要先定义后使用。eg Java C++
+- 弱类型语言:变量类型可以被忽略，会进行类型转换。
+- 强类型语言在速度上可能略逊色于弱类型语言，但是强类型语言带来的严谨性可以有效的避免很多错误。
 
 ### 解释型语言和编译型语言的区别
 
 ### for in 和 for of 的区别
 
+- for...in 遍历
+  - for...in 语句以任意顺序迭代一个对象的除 Symbol 以外的可枚举属性，包括继承的可枚举属性。
+  - 遍历整个原型链，性能很差。
+  - 获取的是 key
+  - 主要是为迭代对象而生，不适用于数组。
+
+```js
+var obj = { a: 1, b: 2, c: 3 };
+
+for (var prop in obj) {
+  console.log("obj." + prop + " = " + obj[prop]);
+}
+
+// Output:
+// "obj.a = 1"
+// "obj.b = 2"
+// "obj.c = 3"
+```
+
+- 区别
+  - for...in 以任意顺序迭代对象的可枚举属性
+  - for...of 语句遍历可迭代对象定义要迭代的数据
+
 ### 如何使用 for of 遍历对象
+
+- for...of 遍历
+  - for...of 语句在可迭代对象（包括 Array，Map，Set，String，TypedArray，arguments 对象等等）上创建一个迭代循环，调用自定义迭代钩子，并为每个不同属性的值执行语句
+  - 遍历对象
+    - 要遍历类数组的话，可以转换一下
+    - 不是类数组，普通对象，可以添加显式迭代方法；`[Symbol.iterator]`
 
 ### ajax axios fetch 的区别
 
+- ajax 是一种模型  
+  缺点：
+  - 本身是针对 MVC 编程，不符合前端 MVVM 的浪潮
+  - 基于原生 XHR 开发，XHR 本身的架构不清晰？？？
+  - 不符合关注分离的原则
+  - 配置和调用方式混乱，而且基于事件的异步模型不友好
+- axios 是基于 XHR 对 ajax 模型的实现，浏览器端和 node 都可以使用
+  - 浏览器端发起 XHR 请求
+  - node 发起 http 请求
+  - 支持 Promise API
+  - 监听请求和返回
+  - 对请求和返回进行转化
+  - 取消请求
+  - 客户端支持抵御 XSRF 攻击
+- fetch 是 ES6 语法中自带的对 ajax 模型的实现  
+  优点：
+  - 语法简洁、更加语义化
+  - 基于标准 Promise 实现，支持 async/await
+  - 更加底层，提供的 API 丰富（request response）
+  - 脱离了 XHR，是 ES 规范里最新的实现方式  
+    缺点
+  - 只对网络错误报错，服务器返回的 400 500 错误码并不会 reject。
+  - 默认不带 cookie
+  - 不支持 abort，不支持超时控制
+  - 不能原生监测请求的进度
+
 ### 数组遍历方法有哪些
 
+- forEach map filter some every reduce reduceRight
+
 ### forEach 和 map 方法有什么区别
+
+- map 方法会返回一个新的数组
 
 # 数据类型
 
