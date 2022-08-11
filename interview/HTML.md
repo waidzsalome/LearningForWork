@@ -56,9 +56,9 @@
 
 # <img src="./static/red_tag.png" alt="drawing" width="20"/>行内元素有哪些？块级元素有哪些？空（void 元素有哪些？）
 
-- 行内元素
-- 块级元素
-- 空元素
+- 行内元素:`a b span img input select strong`
+- 块级元素:`div ul ol li dl dt dd h1 h2 h3 h4 h5 h6 p`
+- 空元素（没有内容的标签，自闭合）:`<br> <hr> <img> <input> <link> <meta>`
 
 # 说一下 web worker
 

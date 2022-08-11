@@ -377,8 +377,8 @@ MyObject.prototype.getMessage = function () {
     - this 绑定
       - 在全局执行上下文中，this 指向全局对象（window 对象）
       - 在函数执行上下文中，this 指向取决于函数如何调用。如果它被一个引用对象调用，那么 this 会被设置成那个对象，否则 this 的值被设置为全局对象或者 undefined
-    - ## 创建词法环境
-    - ## 创建变量环境
+    - 创建词法环境
+    - 创建变量环境
     - LexicalEnvironment（词法环境） 组件被创建
     - VariableEnvironment（变量环境） 组件被创建
   - 执行阶段 此阶段会完成对变量的分配，最后执行完代码。
