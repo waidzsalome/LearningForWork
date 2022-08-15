@@ -1,4 +1,4 @@
-# <img src="./static/red_tag.png" alt="drawing" width="20"/>src 和 href 的区别
+# <div style="width: 10px;height: 10px;background: red; display:inline-block" ></div>src 和 href 的区别
 
 - href 是`Hypertext Reference`的简写，表示超文本引用，指向网络资源所在位置;当浏览器遇到 href 不会停止对当前文档的处理；href 用于在当前文档和引用资源之间确立联系
 
@@ -15,17 +15,17 @@
 <script src="show.js">
 ```
 
-# <img src="./static/red_tag.png" alt="drawing" width="20"/> 对 HTML 语义化的理解
+# <div style="width: 10px;height: 10px;background: red; display:inline-block" ></div> 对 HTML 语义化的理解
 
 # DOCTYPE（文档类型）的作用
 
-# <img src="./static/red_tag.png" alt="drawing" width="20"/>script 标签中 defer 和 async 的区别
+# <div style="width: 10px;height: 10px;background: red; display:inline-block" ></div>script 标签中 defer 和 async 的区别
 
 - 见 js 的内容
 
 # 常用的 meta 标签有哪些
 
-# <img src="./static/red_tag.png" alt="drawing" width="20"/>HTML5 有哪些更新
+# <div style="width: 10px;height: 10px;background: red; display:inline-block" ></div>HTML5 有哪些更新
 
 - 新增语义化标签
 - 新增多媒体标签：可以很方便的嵌入音视频
@@ -54,7 +54,7 @@
 
 # img 的 srcsets 属性
 
-# <img src="./static/red_tag.png" alt="drawing" width="20"/>行内元素有哪些？块级元素有哪些？空（void 元素有哪些？）
+# <div style="width: 10px;height: 10px;background: red; display:inline-block" ></div>行内元素有哪些？块级元素有哪些？空（void 元素有哪些？）
 
 - 行内元素:`a b span img input select strong`
 - 块级元素:`div ul ol li dl dt dd h1 h2 h3 h4 h5 h6 p`
