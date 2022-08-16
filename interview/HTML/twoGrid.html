@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>两栏布局</title>
+  </head>
+  <style>
+    /* 普通浮动 */
+    .outer-float1 {
+      height: 100px;
+    }
+    .left-float1 {
+      float: left;
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-float1 {
+      margin-left: 200px;
+      width: auto;
+      background: gold;
+      height: 100px;
+    }
+    /* 清除浮动 */
+    .outer-float2 {
+      height: 200px;
+      margin-top: 20px;
+    }
+    .left-float2 {
+      float: left;
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-float2 {
+      width: auto;
+      overflow: hidden;
+      height: 200px;
+      background: gold;
+    }
+    /* flex布局 */
+    .outer-flex {
+      height: 100px;
+      display: flex;
+      margin-top: 20px;
+    }
+    .left-flex {
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-flex {
+      flex: 1;
+      background: gold;
+    }
+    /* 绝对定位 */
+    .outer-absolute1 {
+      position: relative;
+      height: 100px;
+      margin-top: 20px;
+    }
+    .left-absolute1 {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-absolute1 {
+      height: 100px;
+      background: gold;
+    }
+    .outer-absolute2 {
+      position: relative;
+      height: 100px;
+      margin-top: 20px;
+    }
+    .left-absolute2 {
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-absolute2 {
+      height: 100px;
+      background: gold;
+      position: absolute;
+      top: 0;
+      left: 200px;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+  <body>
+    <!-- 普通浮动 -->
+    <div class="outer-float1">
+      <div class="left-float1"></div>
+      <div class="right-float1"></div>
+    </div>
+    <!-- 清除浮动 -->
+    <div class="outer-float2">
+      <div class="left-float2"></div>
+      <div class="right-float2"></div>
+    </div>
+    <!-- flex布局 -->
+    <div class="outer-flex">
+      <div class="left-flex"></div>
+      <div class="right-flex"></div>
+    </div>
+    <!-- 绝对定位，相当于right铺满所有宽度，left遮盖了部分right -->
+    <div class="outer-absolute1">
+      <div class="left-absolute1"></div>
+      <div class="right-absolute1"></div>
+    </div>
+    <!-- 绝对定位 -->
+    <div class="outer-absolute2">
+      <div class="left-absolute2"></div>
+      <div class="right-absolute2"></div>
+    </div>
+  </body>
+</html>

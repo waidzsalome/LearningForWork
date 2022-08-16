@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>三栏布局</title>
+  </head>
+  <style>
+    /* 绝对定位 */
+    .outer-absolute {
+      height: 100px;
+      position: relative;
+    }
+    .left-absolute {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-absolute {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      top: 0;
+      right: 0;
+      background: tan;
+    }
+    .center-absolute {
+      height: 100px;
+      margin: 0 200px 0;
+      background: gold;
+    }
+    /* flex */
+    .outer-flex {
+      height: 100px;
+      margin-top: 20px;
+      display: flex;
+    }
+    .left-flex {
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-flex {
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .center-flex {
+      height: 100px;
+      flex: 1;
+      background: gold;
+    }
+    /* 浮动 */
+    .outer-float {
+      height: 100px;
+      margin-top: 20px;
+    }
+    .left-float {
+      float: left;
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .right-float {
+      float: right;
+      width: 200px;
+      height: 100px;
+      background: tan;
+    }
+    .center-float {
+      height: 100px;
+      margin-left: 200px;
+      margin-right: 200px;
+      background: gold;
+    }
+    /* 圣杯 */
+    .outer-holy {
+      height: 100px;
+      margin-top: 20px;
+      padding-left: 200px;
+      padding-right: 200px;
+    }
+    .left-holy {
+      position: relative;
+      /* right: 200px; */
+      left: -200px;
+      margin-left: -100%;
+      float: left;
+      height: 100px;
+      width: 200px;
+      background: tan;
+    }
+    .right-holy {
+      float: left;
+      margin-right: -200px;
+      height: 100px;
+      width: 200px;
+      background: tan;
+    }
+    .center-holy {
+      float: left;
+      height: 100px;
+      width: 100%;
+      background: gold;
+    }
+    /* 双飞翼 */
+    .outer-wing {
+      height: 100px;
+      margin-top: 20px;
+    }
+    .right-wing {
+      float: left;
+      margin-left: -200px;
+      height: 100px;
+      width: 200px;
+      background: tan;
+    }
+    .left-wing {
+      float: left;
+      margin-left: -100%;
+      height: 100px;
+      width: 200px;
+      background: tan;
+    }
+    .wrapper-wing {
+      float: left;
+      width: 100%;
+      height: 100px;
+    }
+    .center-wing {
+      height: 100px;
+      background: gold;
+      margin-left: 200px;
+      margin-right: 200px;
+    }
+  </style>
+  <body>
+    <!-- 绝对定位 -->
+    <div class="outer-absolute">
+      <div class="left-absolute"></div>
+      <div class="center-absolute"></div>
+      <div class="right-absolute"></div>
+    </div>
+    <!-- flex布局 -->
+    <div class="outer-flex">
+      <div class="left-flex"></div>
+      <div class="center-flex"></div>
+      <div class="right-flex"></div>
+    </div>
+    <!-- 浮动 -->
+    <div class="outer-float">
+      <div class="left-float"></div>
+      <div class="right-float"></div>
+      <div class="center-float"></div>
+    </div>
+    <!-- 圣杯 -->
+    <div class="outer-holy">
+      <div class="center-holy"></div>
+      <div class="left-holy"></div>
+      <div class="right-holy"></div>
+    </div>
+    <!-- 双飞翼 -->
+    <div class="outer-wing">
+      <div class="wrapper-wing">
+        <div class="center-wing"></div>
+      </div>
+      <div class="left-wing"></div>
+      <div class="right-wing"></div>
+    </div>
+  </body>
+</html>
