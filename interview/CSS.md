@@ -37,9 +37,9 @@
 
 flex:1; = flex:1 1 0n; (where n is a length unit)
 
-- flex-grow
-- flex-shrink
-- flex-basis
+- flex-grow：增长
+- flex-shrink：收缩
+- flex-basis：基础
 
 ## 响应式设计的概念及基本原理
 
@@ -51,14 +51,43 @@ flex:1; = flex:1 1 0n; (where n is a length unit)
 - 浮动的原理：
   - 浮动元素脱离文档流，不占据空间（引起“高度塌陷”现象）
   - 浮动元素碰到包含它的边框或者其他浮动元素的边框停留
-- 浮动引起的问题：
-  - 父元素的高度无法被撑开，影响与父元素同级的元素
-  - 与浮动元素同级的非浮动元素会跟随其后
-  - 若浮动的元素不是第一个元素，则该元素之前的元素也要浮动，否则会影响页面的显示结构
+- 解决方法
+  - 父元素 overflow:hidden
+  - 父元素伪元素
+
+```css
+.clearfix::after {
+  content: "";
+  /* display: table; */
+  display: block;
+  clear: both;
+}
+```
 
 ## 使用 clear 属性清除浮动的原理
 
 ## :heart:对 BFC 的理解，如何创建 BFC
+
+块级格式化上下文，是 Web 页面的可视 CSS 渲染的一部分，是块级盒子的布局过程发生的区域，也是浮动元素与其他元素交互的区域。  
+创建 BFC 的条件
+
+- 根元素(<html>)
+- 浮动元素(float 不为 none)
+- 绝对定位元素(position absolute fixed)
+- 行内块元素(display inline-block) 表格单元格(display table-cell) 表格标题(display table-caption) 匿名表格单元元素 display 值为 flow-root
+- overflow 值不为 visible clip
+- contain 值为 layout content paint
+- flex (display flex inline-flex)
+- grid (display grid inline-grid)
+- 多列容器（column-count 或 column-width (en-US) 值不为 auto，包括 column-count 为 1）
+- column-span 值为 all 的元素始终会创建一个新的 BFC
+
+BFC 特点
+
+- 包含内部浮动
+- 排除外部浮动
+- 阻止外边距重叠
+  BFC 的区域不会与浮动元素发生重叠
 
 ## 什么是 margin 重叠问题？如何解决？
 

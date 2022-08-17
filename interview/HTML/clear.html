@@ -6,5 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>清除浮动</title>
   </head>
-  <body></body>
+  <style>
+    .outer {
+      background: gold;
+    }
+    .float-left {
+      float: left;
+      height: 200px;
+      width: 200px;
+      background: red;
+    }
+    .common-div {
+      height: 100px;
+      width: 100px;
+      background: greenyellow;
+    }
+    .clearfix::after {
+      clear: both;
+    }
+  </style>
+  <body>
+    <div class="outer clearfix">
+      <div class="common-div"></div>
+      <div class="float-left"></div>
+      <div class="common-div"></div>
+    </div>
+  </body>
 </html>
