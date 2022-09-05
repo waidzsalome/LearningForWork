@@ -4,7 +4,7 @@
 
 - px：像素
 - %: 一般认为是子元素的百分比相对于父元素
-- em：rem 是 CSS3 新增的一个相对单位，相对于根元素（html 元素）的 font-size 的倍数。
+- em：当前对象内 font-size 的尺寸
 - rem：rem 是 CSS3 新增的一个相对单位，相对于根元素（html 元素）的 font-size 的倍数。
 - vw/wh:与视口宽度/高度
 
@@ -95,7 +95,23 @@ BFC 特点
 
 ## :heart:position 的属性有哪些，区别是什么
 
+- absolute:相对于父元素绝对定位
+- relative:相对原本的位置进行定位
+- fixed:相对视口绝对定位
+- static:默认值
+- inherit:继承父元素
+
 ## display、float、position 的关系
+
+- 首先 display，判断是否为 none，如果是 none 则 position 和 float 属性的值不影响元素最后的表现。
+- 然后 position，判断是否为 absolute 或者 fixed，如果是，则 float 属性失效，并且 display 的值应该被设置为 table 或者 block，具体转换需要看初始转换值
+- 如果不是 absolute 或者 fixed，则判断 float 属性的值是否为 none，如果不是，则 display 的值则按上面的规则转换。注意，如果 position 的值为 relative 并且 float 属性的值存在，则 relative 相对于浮动后的最终位置定位。
+- 如果 float 的值为 none，则判断元素是否为根元素，如果是根元素则 display 属性按照上面的规则转换，如果不是，则保持指定的 display 属性值不变。
+
+总结：  
+"position:absolute"和"position:fixed"优先级最高，有它存在的时候，浮动不起作用，'display'的值也需要调整；  
+其次，元素的'float'特性的值不是"none"的时候或者它是根元素的时候，调整'display'的值；  
+最后，非根元素，并且非浮动元素，并且非绝对定位的元素，'display'特性值同设置值。
 
 ## absolute 与 fixed 共同点与不同点
 
@@ -112,6 +128,8 @@ BFC 特点
 ## 画一条 0.5px 的线
 
 ## 设置小于 12px 的字体
+
+- `transform: scale(0.75);`
 
 ## :heart:如何解决 1px 的问题
 
@@ -243,7 +261,7 @@ text-overflow: ellipsis; // 溢出用省略号显示
 white-space: nowrap; // 规定段落中的文本不进行换行
 ```
 
-- ==多行文本溢出==.
+- 多行文本溢出
 
 ```css
 overflow: hidden; // 溢出隐藏
