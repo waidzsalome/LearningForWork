@@ -1,2 +1,9 @@
 # LearningForWork
-工作和学习中遇到的问题
+
+A personal repository for recording problems, solutions, and notes encountered during work and study.
+
+- Algorithms
+- TypeScript
+- Interview preparation
+- Frontend interview coding exercises（basic HandWrite）
+- Engineering practices
